@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/login/login.dart';
+import 'package:flutter_app/utils/data_utils.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'page1.dart';
 import 'page2.dart';
 import 'page3.dart';
@@ -12,46 +15,100 @@ class MyApp extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return new MaterialApp(
-      title:'底部导航',
-      home: new BottomNavigationWidget(),
-      theme: ThemeData(primarySwatch: Colors.blue),
+//      routes: {
+//        //Map<String, WidgetBuilder>
+//        "/myhomepage": (context) => new MyHomePage(),
+//        "/login": (context) => new LoginPage(),
+//        "/page1": (context) => new BottomNavigationWidget(),
+////        "/": (context) => new DetailPage(),
+//      },
+//      onUnknownRoute: (RouteSettings setting) {
+//        String name = setting.name;
+//        print("onUnknownRoute:$name");
+//        return new MaterialPageRoute(builder: (context) {
+//          return new BottomNavigationWidget();
+//        });
+//      },
+
+      title:'欢迎',
+      home: new MyHomePage(),
+      theme: ThemeData(primaryColor: new Color(0xfff4f4f4)),
+
     );
   }
 }
 
-
-/*class TutorialHome extends StatelessWidget {
+class MyHomePage extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState(){
+    return new MyHomePageState();
+  }
+}
+class MyHomePageState extends State<MyHomePage>{
+  bool _hasLogin = false;
+  bool _isLoading = true;
+  bool isConnected = false;
+  String registrationId;
+  @override
+  void initState(){
+    super.initState();
+    DataUtils.TestLogOut().then((res){}); //仅供测试
+    DataUtils.checkLogin().then((haslogin){
+      if (haslogin == true){
+        print('has login');
+        setState(() {
+          _hasLogin = true;
+          _isLoading = false;
+          //print('has logged in');
+        });
+      }else{
+        print('not log in yet');
+        setState(() {
+          _hasLogin = false;
+          _isLoading = false;
+          print('not logged in');
+        });
+      }
+    });
+  }
+  showWelcomePage(){
+    /*DataUtils.checkLogin().then((res){
+      bool haslogin = false;
+      if (res) {
+        print('already log in');
+        haslogin = true;
+      }else{
+        print('not log in yet');
+        haslogin = false;
+      }
+      setState(() {
+        _hasLogin = haslogin;
+      });
+    });*/
+    if (_isLoading) {
+      return Container(
+        color: Color(0xfff4f4f4),
+        child: Center(
+          child: SpinKitPouringHourglass(color: Colors.white),
+        ),
+      );
+    }else
+    if (_hasLogin){
+      return BottomNavigationWidget();
+      //_hasLogin = true; // 占位
+    }else{
+      return LoginPage();
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    //Scaffold是Material中主要的布局组件.
-    return new Scaffold(
-      appBar: new AppBar(
-        leading: new IconButton(
-          icon: new Icon(Icons.menu),
-          tooltip: 'Navigation menu',
-          onPressed: null,
-        ),
-        title: new Text('Example title'),
-        actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.search),
-            tooltip: 'Search',
-            onPressed: null,
-          ),
-        ],
-      ),
-      //body占屏幕的大部分
-      body: new Center(
-        child: new Text('Hello, world!'),
-      ),
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'Add', // used by assistive technologies
-        child: new Icon(Icons.add),
-        onPressed: null,
-      ),
+    return new MaterialApp(
+      title:'主页面',
+      home: new Scaffold(body: showWelcomePage()),
+      theme: ThemeData(primaryColor: new Color(0xfff4f4f4)),
     );
   }
-}*/
+}
 
 class BottomNavigationWidget extends StatefulWidget{
   @override
@@ -62,6 +119,7 @@ class BottomNavigationWidget extends StatefulWidget{
 
 class BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   List<Widget> pages = new List();
+
   @override
 //initState是初始化函数，在绘制底部导航控件的时候就把这3个页面添加到list里面用于下面跟随标签导航进行切换显示
   void initState() {
